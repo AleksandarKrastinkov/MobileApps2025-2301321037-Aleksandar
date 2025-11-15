@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Plants Care",
+    "slug": "plants",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0e27"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.plantscare.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "We need access to your camera to take photos of your plants.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to select plant images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0e27"
+      },
+      "package": "com.plantscare.app",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
+    },
+    "web": {},
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Plants Care to access your camera to take photos of your plants."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Plants Care to access your location for weather-based care recommendations."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "df569718-b5a0-4b1a-8062-2400ebbfb10a"
+      }
+    },
+    "owner": "aleksandarkr"
+  }
+}
