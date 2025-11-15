@@ -2,6 +2,8 @@
 
 A beautiful, futuristic React Native mobile app that helps you care for your plants using AI and image recognition.
 
+> **Note:** This project started as a different app but changed direction. This is the Plants Care app - version 1.0.
+
 ## Features
 
 - 📸 **Plant Identification**: Take photos and identify plants using Perenual and Kindwise APIs
@@ -18,7 +20,7 @@ A beautiful, futuristic React Native mobile app that helps you care for your pla
 npm install
 ```
 
-2. Create a `.env` file in the root directory:
+2. Create a `.env` file in the root directory (copy from `.env.example`):
 ```
 PERENUAL_API_KEY=your_perenual_api_key
 KINDWISE_API_KEY=your_kindwise_api_key
@@ -46,4 +48,3 @@ npm start
 - Axios for API calls
 - React Native Reanimated for animations
 - Expo Camera for photo capture
-
