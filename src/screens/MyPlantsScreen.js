@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import GradientBackground from '../components/GradientBackground';
+import { useThemeMode } from '../context/ThemeContext';
 import PlantCard from '../components/PlantCard';
 import { usePlants } from '../context/PlantContext';
 import FuturisticButton from '../components/FuturisticButton';
@@ -19,6 +20,7 @@ const MyPlantsScreen = () => {
   const navigation = useNavigation();
   const { plants, deletePlant } = usePlants();
   const [refreshing, setRefreshing] = useState(false);
+  const { mode } = useThemeMode();
 
   const handleDelete = (plant) => {
     Alert.alert(
@@ -55,9 +57,25 @@ const MyPlantsScreen = () => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="leaf-outline" size={80} color="#6b7280" />
-      <Text style={styles.emptyTitle}>No Plants Yet</Text>
-      <Text style={styles.emptyText}>
+      <Ionicons
+        name="leaf-outline"
+        size={80}
+        color={mode === 'dark' ? '#6b7280' : '#9ca3af'}
+      />
+      <Text
+        style={[
+          styles.emptyTitle,
+          { color: mode === 'dark' ? '#f9fafb' : '#111827' },
+        ]}
+      >
+        No Plants Yet
+      </Text>
+      <Text
+        style={[
+          styles.emptyText,
+          { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
+        ]}
+      >
         Start by scanning a plant to add it to your collection
       </Text>
       <FuturisticButton
@@ -74,8 +92,22 @@ const MyPlantsScreen = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>My Plants</Text>
-          <Text style={styles.subtitle}>{plants.length} in collection</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
+            ]}
+          >
+            My Plants
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
+            ]}
+          >
+            {plants.length} in collection
+          </Text>
         </View>
 
         {/* Plants List */}

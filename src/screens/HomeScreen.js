@@ -13,6 +13,7 @@ import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { usePlants } from '../context/PlantContext';
+import { useThemeMode } from '../context/ThemeContext';
 import GradientBackground from '../components/GradientBackground';
 import FuturisticButton from '../components/FuturisticButton';
 import { getCurrentWeather } from '../services/weatherService';
@@ -21,6 +22,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const { plants } = usePlants();
   const [weather, setWeather] = useState(null);
+  const { mode, toggleTheme } = useThemeMode();
 
   useEffect(() => {
     loadWeather();
@@ -45,18 +47,59 @@ const HomeScreen = () => {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <Text style={styles.greeting}>Hello, Plant Lover! 🌿</Text>
-              <Text style={styles.subtitle}>Discover and care for your plants</Text>
+              <Text
+                style={[
+                  styles.greeting,
+                  { color: mode === 'dark' ? '#ffffff' : '#111827' },
+                ]}
+              >
+                Hello, Plant Lover! 🌿
+              </Text>
+              <Text
+                style={[
+                  styles.subtitle,
+                  { color: mode === 'dark' ? '#9ca3af' : '#4b5563' },
+                ]}
+              >
+                Discover and care for your plants
+              </Text>
             </View>
-            {weather && (
-              <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
-                <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
-                <View style={styles.weatherInfo}>
-                  <Text style={styles.temp}>{Math.round(weather.temp)}°C</Text>
-                  <Text style={styles.weatherDesc}>{weather.description}</Text>
+            <View style={styles.headerRight}>
+              {weather && (
+                <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
+                  <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
+                  <View style={styles.weatherInfo}>
+                    <Text style={styles.temp}>{Math.round(weather.temp)}°C</Text>
+                    <Text style={styles.weatherDesc}>{weather.description}</Text>
+                  </View>
+                </BlurView>
+              )}
+            </View>
+          </View>
+
+          {/* Theme Toggle */}
+          <View style={styles.themeToggleContainer}>
+            <TouchableOpacity
+              onPress={toggleTheme}
+              activeOpacity={0.9}
+            >
+              <BlurView intensity={35} tint="dark" style={styles.themeToggle}>
+                <View
+                  style={[
+                    styles.themeThumb,
+                    mode === 'dark' ? styles.themeThumbRight : styles.themeThumbLeft,
+                  ]}
+                />
+                <View style={styles.themeLabels}>
+                  <Text style={[styles.themeLabel, mode === 'light' && styles.themeLabelActive]}>
+                    Light
+                  </Text>
+                  <Text style={[styles.themeLabel, mode === 'dark' && styles.themeLabelActive]}>
+                    Dark
+                  </Text>
                 </View>
               </BlurView>
-            )}
+            </TouchableOpacity>
           </View>
 
           {/* Main Action Card */}
@@ -122,7 +165,14 @@ const HomeScreen = () => {
           {/* Recent Plants */}
           {plants.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Recent Plants</Text>
+              <Text
+                style={[
+                  styles.sectionTitle,
+                  { color: mode === 'dark' ? '#ffffff' : '#111827' },
+                ]}
+              >
+                Recent Plants
+              </Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -160,7 +210,14 @@ const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: mode === 'dark' ? '#ffffff' : '#111827' },
+              ]}
+            >
+              Quick Actions
+            </Text>
             <View style={styles.actionsGrid}>
               <BlurView intensity={35} tint="dark" style={styles.actionCard}>
                 <TouchableOpacity
@@ -207,6 +264,59 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 12,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  themeToggleContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+  },
+  themeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 999,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.6)',
+    backgroundColor: 'rgba(15,23,42,0.7)',
+    overflow: 'hidden',
+  },
+  themeThumb: {
+    position: 'absolute',
+    top: 3,
+    bottom: 3,
+    width: '50%',
+    borderRadius: 999,
+    backgroundColor: 'rgba(15,23,42,0.95)',
+    shadowColor: '#020617',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+  },
+  themeThumbLeft: {
+    left: 3,
+  },
+  themeThumbRight: {
+    right: 3,
+  },
+  themeLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  themeLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9ca3af',
+  },
+  themeLabelActive: {
+    color: '#f9fafb',
+  },
   greeting: {
     fontSize: 28,
     fontWeight: '800',
@@ -226,8 +336,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(148,163,184,0.4)',
     backgroundColor: 'rgba(15,23,42,0.6)',
-    maxWidth: '55%',
-    flexShrink: 1,
+    marginLeft: 'auto',
   },
   weatherInfo: {
     marginLeft: 8,
