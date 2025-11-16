@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-nat
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
+// A more refined, luxury-style button with soft gradients and subtle depth.
 const FuturisticButton = ({
   title,
   onPress,
@@ -14,8 +15,8 @@ const FuturisticButton = ({
 }) => {
   const isPrimary = variant === 'primary';
   const colors = isPrimary
-    ? ['#00ff88', '#00cc6a', '#00994d']
-    : ['#1a1f3a', '#0f1425'];
+    ? ['#7c3aed', '#a855f7', '#ec4899'] // soft purple/pink gradient
+    : ['rgba(15,23,42,0.8)', 'rgba(24,24,48,0.9)'];
 
   if (variant === 'outline') {
     return (
@@ -23,11 +24,11 @@ const FuturisticButton = ({
         onPress={onPress}
         disabled={disabled || loading}
         style={[styles.outlineButton, style, disabled && styles.disabled]}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
       >
-        {icon && <Ionicons name={icon} size={20} color="#00ff88" style={styles.icon} />}
+        {icon && <Ionicons name={icon} size={20} color="#e5e7eb" style={styles.icon} />}
         {loading ? (
-          <ActivityIndicator color="#00ff88" />
+          <ActivityIndicator color="#e5e7eb" />
         ) : (
           <Text style={styles.outlineButtonText}>{title}</Text>
         )}
@@ -40,7 +41,7 @@ const FuturisticButton = ({
       onPress={onPress}
       disabled={disabled || loading}
       style={[styles.buttonContainer, style, disabled && styles.disabled]}
-      activeOpacity={0.8}
+      activeOpacity={0.85}
     >
       <LinearGradient
         colors={colors}
@@ -48,9 +49,9 @@ const FuturisticButton = ({
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        {icon && <Ionicons name={icon} size={20} color="#fff" style={styles.icon} />}
+        {icon && <Ionicons name={icon} size={20} color="#f9fafb" style={styles.icon} />}
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color="#f9fafb" />
         ) : (
           <Text style={styles.buttonText}>{title}</Text>
         )}
@@ -61,49 +62,50 @@ const FuturisticButton = ({
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    borderRadius: 15,
+    borderRadius: 18,
     overflow: 'hidden',
-    elevation: 5,
-    shadowColor: '#00ff88',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    elevation: 8,
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    backgroundColor: 'rgba(15,23,42,0.8)',
   },
   gradient: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: '#f9fafb',
     fontSize: 16,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
   outlineButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 15,
-    borderWidth: 2,
-    borderColor: '#00ff88',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(226,232,240,0.5)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(15,23,42,0.6)',
   },
   outlineButtonText: {
-    color: '#00ff88',
+    color: '#e5e7eb',
     fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 1,
+    fontWeight: '600',
+    letterSpacing: 0.8,
   },
   icon: {
     marginRight: 8,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
 });
 
