@@ -2,8 +2,10 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// App-wide background with a luxurious, tinted purple/indigo gradient.
+// This keeps the content readable while giving a premium, atmospheric feel.
 const GradientBackground = ({ children, colors, style }) => {
-  const defaultColors = ['#0a0e27', '#1a1f3a', '#0f1425'];
+  const defaultColors = ['#050616', '#141432', '#25194a'];
 
   return (
     <LinearGradient

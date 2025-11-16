@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { usePlants } from '../context/PlantContext';
@@ -43,18 +44,18 @@ const HomeScreen = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            <View>
+            <View style={styles.headerLeft}>
               <Text style={styles.greeting}>Hello, Plant Lover! 🌿</Text>
               <Text style={styles.subtitle}>Discover and care for your plants</Text>
             </View>
             {weather && (
-              <View style={styles.weatherCard}>
-                <Ionicons name="partly-sunny" size={24} color="#00ff88" />
+              <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
+                <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
                 <View style={styles.weatherInfo}>
                   <Text style={styles.temp}>{Math.round(weather.temp)}°C</Text>
                   <Text style={styles.weatherDesc}>{weather.description}</Text>
                 </View>
-              </View>
+              </BlurView>
             )}
           </View>
 
@@ -64,43 +65,45 @@ const HomeScreen = () => {
             style={styles.mainCard}
             activeOpacity={0.9}
           >
-            <LinearGradient
-              colors={['#00ff88', '#00cc6a', '#00994d']}
-              style={styles.mainCardGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.mainCardContent}>
-                <View style={styles.cameraIconContainer}>
-                  <Ionicons name="camera" size={48} color="#fff" />
+            <BlurView intensity={50} tint="dark" style={styles.mainCardBlur}>
+              <LinearGradient
+                colors={['rgba(124,58,237,0.85)', 'rgba(168,85,247,0.9)', 'rgba(236,72,153,0.95)']}
+                style={styles.mainCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.mainCardContent}>
+                  <View style={styles.cameraIconContainer}>
+                    <Ionicons name="camera" size={48} color="#f9fafb" />
+                  </View>
+                  <Text style={styles.mainCardTitle}>Scan Your Plant</Text>
+                  <Text style={styles.mainCardSubtitle}>
+                    Take a photo to identify and get care tips
+                  </Text>
                 </View>
-                <Text style={styles.mainCardTitle}>Scan Your Plant</Text>
-                <Text style={styles.mainCardSubtitle}>
-                  Take a photo to identify and get care tips
-                </Text>
-              </View>
-              <View style={styles.glowEffect} />
-            </LinearGradient>
+                <View style={styles.glowEffect} />
+              </LinearGradient>
+            </BlurView>
           </TouchableOpacity>
 
           {/* Quick Stats */}
           <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
+            <BlurView intensity={40} tint="dark" style={styles.statCard}>
               <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
+                colors={['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']}
                 style={styles.statGradient}
               >
-                <Ionicons name="leaf" size={32} color="#00ff88" />
+                <Ionicons name="leaf" size={28} color="#c4b5fd" />
                 <Text style={styles.statNumber}>{plants.length}</Text>
                 <Text style={styles.statLabel}>My Plants</Text>
               </LinearGradient>
-            </View>
-            <View style={styles.statCard}>
+            </BlurView>
+            <BlurView intensity={40} tint="dark" style={styles.statCard}>
               <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
+                colors={['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']}
                 style={styles.statGradient}
               >
-                <Ionicons name="water" size={32} color="#00ff88" />
+                <Ionicons name="water" size={28} color="#a5b4fc" />
                 <Text style={styles.statNumber}>
                   {plants.filter((p) => {
                     if (!p.lastWatered) return true;
@@ -113,7 +116,7 @@ const HomeScreen = () => {
                 </Text>
                 <Text style={styles.statLabel}>Need Water</Text>
               </LinearGradient>
-            </View>
+            </BlurView>
           </View>
 
           {/* Recent Plants */}
@@ -143,7 +146,7 @@ const HomeScreen = () => {
                       />
                     ) : (
                       <View style={styles.recentPlantPlaceholder}>
-                        <Ionicons name="leaf" size={32} color="#00ff88" />
+                        <Ionicons name="leaf" size={28} color="#c4b5fd" />
                       </View>
                     )}
                     <Text style={styles.recentPlantName} numberOfLines={1}>
@@ -159,30 +162,26 @@ const HomeScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Quick Actions</Text>
             <View style={styles.actionsGrid}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('MyPlants')}
-                style={styles.actionCard}
-              >
-                <LinearGradient
-                  colors={['#1a1f3a', '#0f1425']}
-                  style={styles.actionGradient}
+              <BlurView intensity={35} tint="dark" style={styles.actionCard}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('MyPlants')}
+                  style={styles.actionInner}
+                  activeOpacity={0.9}
                 >
-                  <Ionicons name="library" size={28} color="#00ff88" />
+                  <Ionicons name="library" size={24} color="#e5e7eb" />
                   <Text style={styles.actionText}>My Collection</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('CareGuide')}
-                style={styles.actionCard}
-              >
-                <LinearGradient
-                  colors={['#1a1f3a', '#0f1425']}
-                  style={styles.actionGradient}
+                </TouchableOpacity>
+              </BlurView>
+              <BlurView intensity={35} tint="dark" style={styles.actionCard}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('CareGuide')}
+                  style={styles.actionInner}
+                  activeOpacity={0.9}
                 >
-                  <Ionicons name="book" size={28} color="#00ff88" />
+                  <Ionicons name="book" size={24} color="#e5e7eb" />
                   <Text style={styles.actionText}>Care Guide</Text>
-                </LinearGradient>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </BlurView>
             </View>
           </View>
         </ScrollView>
@@ -204,6 +203,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
+  headerLeft: {
+    flex: 1,
+    paddingRight: 12,
+  },
   greeting: {
     fontSize: 28,
     fontWeight: '800',
@@ -217,11 +220,14 @@ const styles = StyleSheet.create({
   weatherCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(26, 31, 58, 0.8)',
-    padding: 12,
-    borderRadius: 15,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.4)',
+    backgroundColor: 'rgba(15,23,42,0.6)',
+    maxWidth: '55%',
+    flexShrink: 1,
   },
   weatherInfo: {
     marginLeft: 8,
@@ -229,23 +235,27 @@ const styles = StyleSheet.create({
   temp: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
   },
   weatherDesc: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#cbd5f5',
     textTransform: 'capitalize',
   },
   mainCard: {
     marginHorizontal: 20,
     marginBottom: 24,
-    borderRadius: 25,
+    borderRadius: 28,
     overflow: 'hidden',
-    elevation: 10,
-    shadowColor: '#00ff88',
+    elevation: 16,
+    shadowColor: '#020617',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    shadowOpacity: 0.6,
+    shadowRadius: 30,
+  },
+  mainCardBlur: {
+    borderRadius: 28,
+    overflow: 'hidden',
   },
   mainCardGradient: {
     padding: 32,
@@ -259,7 +269,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(15,23,42,0.35)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
@@ -267,12 +277,12 @@ const styles = StyleSheet.create({
   mainCardTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f9fafb',
     marginBottom: 8,
   },
   mainCardSubtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: 'rgba(249, 250, 251, 0.8)',
     textAlign: 'center',
   },
   glowEffect: {
@@ -282,8 +292,8 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: '#fff',
-    opacity: 0.1,
+    backgroundColor: '#a855f7',
+    opacity: 0.2,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -293,19 +303,19 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 22,
     overflow: 'hidden',
   },
   statGradient: {
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.35)',
   },
   statNumber: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#e5e7eb',
     marginTop: 8,
   },
   statLabel: {
@@ -341,16 +351,16 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 15,
-    backgroundColor: '#1a1f3a',
+    backgroundColor: 'rgba(15,23,42,0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.35)',
   },
   recentPlantName: {
     fontSize: 12,
-    color: '#fff',
+    color: '#e5e7eb',
     textAlign: 'center',
     maxWidth: 80,
   },
@@ -364,16 +374,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
-  actionGradient: {
-    padding: 20,
+  actionInner: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.4)',
+    backgroundColor: 'rgba(15,23,42,0.6)',
   },
   actionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#fff',
+    color: '#e5e7eb',
     marginTop: 8,
   },
 });

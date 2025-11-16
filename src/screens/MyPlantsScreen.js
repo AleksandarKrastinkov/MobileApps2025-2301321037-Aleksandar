@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import GradientBackground from '../components/GradientBackground';
 import PlantCard from '../components/PlantCard';
 import { usePlants } from '../context/PlantContext';
+import FuturisticButton from '../components/FuturisticButton';
 
 const MyPlantsScreen = () => {
   const navigation = useNavigation();
@@ -59,13 +60,12 @@ const MyPlantsScreen = () => {
       <Text style={styles.emptyText}>
         Start by scanning a plant to add it to your collection
       </Text>
-      <TouchableOpacity
+      <FuturisticButton
+        title="Scan a Plant"
+        icon="camera"
         onPress={() => navigation.navigate('Home')}
         style={styles.emptyButton}
-      >
-        <Ionicons name="camera" size={20} color="#00ff88" />
-        <Text style={styles.emptyButtonText}>Scan Plant</Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 
@@ -110,12 +110,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f9fafb',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#cbd5f5',
   },
   list: {
     paddingVertical: 8,
@@ -132,31 +132,18 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
     marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#cbd5f5',
     textAlign: 'center',
     marginBottom: 32,
   },
   emptyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 255, 136, 0.2)',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#00ff88',
-  },
-  emptyButtonText: {
-    color: '#00ff88',
-    fontSize: 16,
-    fontWeight: '700',
-    marginLeft: 8,
+    marginTop: 8,
   },
 });
 

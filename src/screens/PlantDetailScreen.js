@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
 import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
@@ -152,7 +153,7 @@ const PlantDetailScreen = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={24} color="#f9fafb" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Plant Details</Text>
           <View style={styles.placeholder} />
@@ -171,49 +172,56 @@ const PlantDetailScreen = () => {
 
           {/* Plant Name */}
           <View style={styles.nameCard}>
-            <Text style={styles.plantName}>{plant.name}</Text>
-            {plant.species && (
-              <Text style={styles.species}>{plant.species}</Text>
-            )}
+            <BlurView intensity={45} tint="dark" style={styles.nameBlur}>
+              <LinearGradient
+                colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.7)']}
+                style={styles.nameGradient}
+              >
+                <Text style={styles.plantName}>{plant.name}</Text>
+                {plant.species && (
+                  <Text style={styles.species}>{plant.species}</Text>
+                )}
+              </LinearGradient>
+            </BlurView>
           </View>
 
           {/* Quick Actions */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity
-              onPress={handleWaterPlant}
-              style={styles.actionButton}
-            >
-              <LinearGradient
-                colors={['#00ff88', '#00cc6a']}
-                style={styles.actionGradient}
-              >
-                <Ionicons name="water" size={24} color="#fff" />
-                <Text style={styles.actionText}>Water</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleDetectIssues}
-              style={styles.actionButton}
-            >
-              <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
-                style={[styles.actionGradient, styles.actionGradientOutline]}
-              >
-                <Ionicons name="medical" size={24} color="#00ff88" />
-                <Text style={[styles.actionText, styles.actionTextOutline]}>
-                  Check Health
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <BlurView intensity={40} tint="dark" style={styles.actionButton}>
+              <TouchableOpacity onPress={handleWaterPlant} style={styles.actionInner}>
+                <LinearGradient
+                  colors={['#22c55e', '#4ade80']}
+                  style={styles.actionGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Ionicons name="water" size={22} color="#f9fafb" />
+                  <Text style={styles.actionText}>Water</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </BlurView>
+            <BlurView intensity={40} tint="dark" style={styles.actionButton}>
+              <TouchableOpacity onPress={handleDetectIssues} style={styles.actionInner}>
+                <LinearGradient
+                  colors={['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']}
+                  style={[styles.actionGradient, styles.actionGradientOutline]}
+                >
+                  <Ionicons name="medical" size={22} color="#c4b5fd" />
+                  <Text style={[styles.actionText, styles.actionTextOutline]}>
+                    Check Health
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </BlurView>
           </View>
 
           {/* Watering Status */}
           {daysSinceWatered !== null && (
-            <View style={styles.statusCard}>
+            <BlurView intensity={40} tint="dark" style={styles.statusCard}>
               <Ionicons
                 name={daysSinceWatered >= 3 ? 'warning' : 'checkmark-circle'}
                 size={24}
-                color={daysSinceWatered >= 3 ? '#ffaa00' : '#00ff88'}
+                color={daysSinceWatered >= 3 ? '#fbbf24' : '#4ade80'}
               />
               <View style={styles.statusInfo}>
                 <Text style={styles.statusTitle}>
@@ -229,60 +237,65 @@ const PlantDetailScreen = () => {
                     : `Watered ${daysSinceWatered} days ago`}
                 </Text>
               </View>
-            </View>
+            </BlurView>
           )}
 
           {/* Weather Info */}
           {weather && (
-            <View style={styles.weatherCard}>
-              <Ionicons name="partly-sunny" size={24} color="#00ff88" />
+            <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
+              <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
               <View style={styles.weatherInfo}>
                 <Text style={styles.weatherText}>
                   {Math.round(weather.temp)}°C • {weather.description}
                 </Text>
                 <Text style={styles.weatherLocation}>{weather.location.city}</Text>
               </View>
-            </View>
+            </BlurView>
           )}
 
           {/* Care Advice */}
           {careAdvice && (
             <View style={styles.careCard}>
-              <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
-                style={styles.careGradient}
-              >
-                <View style={styles.careHeader}>
-                  <Ionicons name="sparkles" size={24} color="#00ff88" />
-                  <Text style={styles.careTitle}>Care Instructions</Text>
-                </View>
-                <Text style={styles.careText}>{careAdvice}</Text>
-              </LinearGradient>
+              <BlurView intensity={45} tint="dark" style={styles.careBlur}>
+                <LinearGradient
+                  colors={['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']}
+                  style={styles.careGradient}
+                >
+                  <View style={styles.careHeader}>
+                    <Ionicons name="sparkles" size={24} color="#c4b5fd" />
+                    <Text style={styles.careTitle}>Care Instructions</Text>
+                  </View>
+                  <Text style={styles.careText}>{careAdvice}</Text>
+                </LinearGradient>
+              </BlurView>
             </View>
           )}
 
           {/* Issues Detection */}
           {issues && (
             <View style={styles.issuesCard}>
-              <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
-                style={styles.issuesGradient}
-              >
-                <View style={styles.issuesHeader}>
-                  <Ionicons name="medical" size={24} color="#ffaa00" />
-                  <Text style={styles.issuesTitle}>Health Analysis</Text>
-                </View>
-                <Text style={styles.issuesText}>{issues}</Text>
-              </LinearGradient>
+              <BlurView intensity={45} tint="dark" style={styles.issuesBlur}>
+                <LinearGradient
+                  colors={['rgba(15,23,42,0.95)', 'rgba(190,24,93,0.9)']}
+                  style={styles.issuesGradient}
+                >
+                  <View style={styles.issuesHeader}>
+                    <Ionicons name="medical" size={24} color="#facc15" />
+                    <Text style={styles.issuesTitle}>Health Analysis</Text>
+                  </View>
+                  <Text style={styles.issuesText}>{issues}</Text>
+                </LinearGradient>
+              </BlurView>
             </View>
           )}
 
           {/* Notes */}
           <View style={styles.notesCard}>
-            <LinearGradient
-              colors={['#1a1f3a', '#0f1425']}
-              style={styles.notesGradient}
-            >
+            <BlurView intensity={45} tint="dark" style={styles.notesBlur}>
+              <LinearGradient
+                colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']}
+                style={styles.notesGradient}
+              >
               <View style={styles.notesHeader}>
                 <Ionicons name="document-text" size={24} color="#00ff88" />
                 <Text style={styles.notesTitle}>Notes</Text>
@@ -291,7 +304,7 @@ const PlantDetailScreen = () => {
                     onPress={() => setEditingNotes(true)}
                     style={styles.editButton}
                   >
-                    <Ionicons name="pencil" size={18} color="#00ff88" />
+                    <Ionicons name="pencil" size={18} color="#c4b5fd" />
                   </TouchableOpacity>
                 )}
               </View>
@@ -328,7 +341,8 @@ const PlantDetailScreen = () => {
                   {notes || 'No notes yet. Tap the edit icon to add notes.'}
                 </Text>
               )}
-            </LinearGradient>
+              </LinearGradient>
+            </BlurView>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -362,7 +376,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
   },
   placeholder: {
     width: 40,
@@ -385,15 +399,25 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
   },
+  nameBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  nameGradient: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(148,163,184,0.45)',
+  },
   plantName: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f9fafb',
     marginBottom: 4,
   },
   species: {
     fontSize: 16,
-    color: '#00ff88',
+    color: '#c4b5fd',
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -403,36 +427,42 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    borderRadius: 15,
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  actionInner: {
+    borderRadius: 18,
     overflow: 'hidden',
   },
   actionGradient: {
-    padding: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
     alignItems: 'center',
+    borderRadius: 18,
   },
   actionGradientOutline: {
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(129,140,248,0.7)',
   },
   actionText: {
-    color: '#fff',
+    color: '#f9fafb',
     fontSize: 14,
     fontWeight: '700',
     marginTop: 8,
   },
   actionTextOutline: {
-    color: '#00ff88',
+    color: '#e5e7eb',
   },
   statusCard: {
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 20,
     marginBottom: 20,
-    backgroundColor: 'rgba(26, 31, 58, 0.8)',
     padding: 16,
-    borderRadius: 15,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.4)',
+    backgroundColor: 'rgba(15,23,42,0.7)',
   },
   statusInfo: {
     marginLeft: 12,
@@ -441,11 +471,11 @@ const styles = StyleSheet.create({
   statusTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
   },
   statusText: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#cbd5f5',
     marginTop: 4,
   },
   weatherCard: {
@@ -453,11 +483,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 20,
     marginBottom: 20,
-    backgroundColor: 'rgba(26, 31, 58, 0.8)',
     padding: 16,
-    borderRadius: 15,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.4)',
+    backgroundColor: 'rgba(15,23,42,0.7)',
   },
   weatherInfo: {
     marginLeft: 12,
@@ -466,11 +496,11 @@ const styles = StyleSheet.create({
   weatherText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
   },
   weatherLocation: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#cbd5f5',
     marginTop: 4,
   },
   careCard: {
@@ -479,10 +509,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
+  careBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   careGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.45)',
   },
   careHeader: {
     flexDirection: 'row',
@@ -492,12 +526,12 @@ const styles = StyleSheet.create({
   careTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
     marginLeft: 12,
   },
   careText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#e5e7eb',
     lineHeight: 22,
   },
   issuesCard: {
@@ -506,10 +540,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
+  issuesBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   issuesGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: '#ffaa00',
+    borderColor: 'rgba(250,204,21,0.8)',
   },
   issuesHeader: {
     flexDirection: 'row',
@@ -519,12 +557,12 @@ const styles = StyleSheet.create({
   issuesTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
     marginLeft: 12,
   },
   issuesText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#e5e7eb',
     lineHeight: 22,
   },
   notesCard: {
@@ -533,10 +571,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
+  notesBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   notesGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.45)',
   },
   notesHeader: {
     flexDirection: 'row',
@@ -546,7 +588,7 @@ const styles = StyleSheet.create({
   notesTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
     marginLeft: 12,
     flex: 1,
   },
@@ -554,19 +596,19 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   notesInput: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(15,23,42,0.7)',
     borderRadius: 10,
     padding: 12,
-    color: '#fff',
+    color: '#f9fafb',
     fontSize: 14,
     minHeight: 100,
     textAlignVertical: 'top',
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(129,140,248,0.7)',
   },
   notesText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#e5e7eb',
     lineHeight: 22,
   },
   notesActions: {

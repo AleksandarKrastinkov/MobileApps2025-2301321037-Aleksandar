@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
 
 const CareGuideScreen = () => {
@@ -137,53 +138,57 @@ Wilting:
               style={styles.topicCard}
               activeOpacity={0.9}
             >
-              <LinearGradient
-                colors={['#1a1f3a', '#0f1425']}
-                style={styles.topicGradient}
-              >
-                <View style={styles.topicHeader}>
-                  <View style={styles.topicHeaderLeft}>
-                    <View style={styles.iconContainer}>
-                      <Ionicons name={topic.icon} size={24} color="#00ff88" />
+              <BlurView intensity={45} tint="dark" style={styles.topicBlur}>
+                <LinearGradient
+                  colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']}
+                  style={styles.topicGradient}
+                >
+                  <View style={styles.topicHeader}>
+                    <View style={styles.topicHeaderLeft}>
+                      <View style={styles.iconContainer}>
+                        <Ionicons name={topic.icon} size={24} color="#c4b5fd" />
+                      </View>
+                      <Text style={styles.topicTitle}>{topic.title}</Text>
                     </View>
-                    <Text style={styles.topicTitle}>{topic.title}</Text>
+                    <Ionicons
+                      name={
+                        expandedSection === topic.id
+                          ? 'chevron-up'
+                          : 'chevron-down'
+                      }
+                      size={24}
+                      color="#e5e7eb"
+                    />
                   </View>
-                  <Ionicons
-                    name={
-                      expandedSection === topic.id
-                        ? 'chevron-up'
-                        : 'chevron-down'
-                    }
-                    size={24}
-                    color="#00ff88"
-                  />
-                </View>
-                {expandedSection === topic.id && (
-                  <View style={styles.topicContent}>
-                    <Text style={styles.topicText}>{topic.content}</Text>
-                  </View>
-                )}
-              </LinearGradient>
+                  {expandedSection === topic.id && (
+                    <View style={styles.topicContent}>
+                      <Text style={styles.topicText}>{topic.content}</Text>
+                    </View>
+                  )}
+                </LinearGradient>
+              </BlurView>
             </TouchableOpacity>
           ))}
 
           {/* Tips Section */}
           <View style={styles.tipsCard}>
-            <LinearGradient
-              colors={['#00ff88', '#00cc6a']}
-              style={styles.tipsGradient}
-            >
-              <Ionicons name="bulb" size={32} color="#000" />
-              <Text style={styles.tipsTitle}>Pro Tips</Text>
-              <Text style={styles.tipsText}>
+            <BlurView intensity={50} tint="dark" style={styles.tipsBlur}>
+              <LinearGradient
+                colors={['#7c3aed', '#a855f7', '#ec4899']}
+                style={styles.tipsGradient}
+              >
+                <Ionicons name="bulb" size={32} color="#0b1120" />
+                <Text style={styles.tipsTitle}>Pro Tips</Text>
+                <Text style={styles.tipsText}>
                 • Rotate plants weekly for even growth{'\n'}
                 • Clean leaves regularly to maximize light absorption{'\n'}
                 • Repot when roots fill the container{'\n'}
                 • Research each plant's specific needs{'\n'}
                 • Keep a care journal to track what works{'\n'}
                 • Don't overthink it - plants are resilient!
-              </Text>
-            </LinearGradient>
+                </Text>
+              </LinearGradient>
+            </BlurView>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -202,12 +207,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f9fafb',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#cbd5f5',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -218,10 +223,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
+  topicBlur: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   topicGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: '#00ff88',
+    borderColor: 'rgba(148,163,184,0.45)',
   },
   topicHeader: {
     flexDirection: 'row',
@@ -237,7 +246,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 255, 136, 0.2)',
+    backgroundColor: 'rgba(129,140,248,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -245,7 +254,7 @@ const styles = StyleSheet.create({
   topicTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
+    color: '#f9fafb',
     flex: 1,
   },
   topicContent: {
@@ -256,13 +265,17 @@ const styles = StyleSheet.create({
   },
   topicText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#e5e7eb',
     lineHeight: 22,
   },
   tipsCard: {
     marginHorizontal: 20,
     marginTop: 8,
     marginBottom: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  tipsBlur: {
     borderRadius: 20,
     overflow: 'hidden',
   },
@@ -273,13 +286,13 @@ const styles = StyleSheet.create({
   tipsTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#000',
+    color: '#0b1120',
     marginTop: 12,
     marginBottom: 16,
   },
   tipsText: {
     fontSize: 14,
-    color: '#000',
+    color: '#0b1120',
     lineHeight: 24,
     textAlign: 'center',
     fontWeight: '600',
