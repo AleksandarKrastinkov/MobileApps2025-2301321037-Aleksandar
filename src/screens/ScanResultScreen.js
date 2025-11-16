@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
 import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { usePlants } from '../context/PlantContext';
@@ -31,6 +32,7 @@ const ScanResultScreen = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
 
   useEffect(() => {
     loadCareAdvice();
@@ -95,14 +97,7 @@ const ScanResultScreen = () => {
       <GradientBackground>
         <SafeAreaView style={styles.container}>
           <View style={styles.centerContent}>
-            <Text
-              style={[
-                styles.text,
-                { color: mode === 'dark' ? '#ffffff' : '#111827' },
-              ]}
-            >
-              No plant data available
-            </Text>
+            <Text style={[styles.text, { color: theme.text }]}>No plant data available</Text>
             <FuturisticButton
               title="Go Back"
               onPress={() => navigation.goBack()}
@@ -125,20 +120,9 @@ const ScanResultScreen = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={mode === 'dark' ? '#f9fafb' : '#111827'}
-            />
+            <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text
-            style={[
-              styles.headerTitle,
-              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
-            ]}
-          >
-            Plant Identified
-          </Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Plant Identified</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -150,9 +134,19 @@ const ScanResultScreen = () => {
           {imageUri && (
             <View style={styles.imageContainer}>
               <Image source={{ uri: imageUri }} style={styles.plantImage} />
-              <BlurView intensity={40} tint="dark" style={styles.confidenceBadge}>
-                <Ionicons name="checkmark-circle" size={16} color="#a5b4fc" />
-                <Text style={styles.confidenceText}>
+              <BlurView
+                intensity={40}
+                tint={theme.blurTint}
+                style={[
+                  styles.confidenceBadge,
+                  {
+                    backgroundColor: theme.card,
+                    borderColor: theme.borderStrong,
+                  },
+                ]}
+              >
+                <Ionicons name="checkmark-circle" size={16} color={theme.iconAccent} />
+                <Text style={[styles.confidenceText, { color: theme.text }]}>
                   {Math.round(plantData.confidence * 100)}% match
                 </Text>
               </BlurView>
@@ -161,14 +155,18 @@ const ScanResultScreen = () => {
 
           {/* Plant Info Card */}
           <View style={styles.infoCard}>
-            <BlurView intensity={45} tint="dark" style={styles.infoBlur}>
+            <BlurView intensity={45} tint={theme.blurTint} style={styles.infoBlur}>
               <LinearGradient
-                colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.75)']}
-                style={styles.infoGradient}
+                colors={
+                  mode === 'light'
+                    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                    : ['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.75)']
+                }
+                style={[styles.infoGradient, { borderColor: theme.border }]}
               >
-                <Text style={styles.plantName}>{plantData.name}</Text>
+                <Text style={[styles.plantName, { color: theme.text }]}>{plantData.name}</Text>
                 {plantData.wikiDescription && (
-                  <Text style={styles.description} numberOfLines={4}>
+                  <Text style={[styles.description, { color: theme.textMuted }]} numberOfLines={4}>
                     {plantData.wikiDescription}
                   </Text>
                 )}
@@ -177,8 +175,23 @@ const ScanResultScreen = () => {
                     {plantData.kindwiseData.plant_details.common_names
                       .slice(0, 3)
                       .map((name, index) => (
-                        <View key={index} style={styles.tag}>
-                          <Text style={styles.tagText}>{name}</Text>
+                        <View
+                          key={index}
+                          style={[
+                            styles.tag,
+                            {
+                              backgroundColor:
+                                mode === 'light'
+                                  ? 'rgba(124,58,237,0.15)'
+                                  : 'rgba(129,140,248,0.25)',
+                              borderColor:
+                                mode === 'light'
+                                  ? 'rgba(124,58,237,0.4)'
+                                  : 'rgba(129,140,248,0.7)',
+                            },
+                          ]}
+                        >
+                          <Text style={[styles.tagText, { color: theme.iconAccent }]}>{name}</Text>
                         </View>
                       ))}
                   </View>
@@ -189,13 +202,25 @@ const ScanResultScreen = () => {
 
           {/* Weather Info */}
           {weather && (
-            <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
-              <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
+            <BlurView
+              intensity={40}
+              tint={theme.blurTint}
+              style={[
+                styles.weatherCard,
+                {
+                  backgroundColor: theme.card,
+                  borderColor: theme.border,
+                },
+              ]}
+            >
+              <Ionicons name="partly-sunny" size={24} color={theme.iconAccent} />
               <View style={styles.weatherInfo}>
-                <Text style={styles.weatherText}>
+                <Text style={[styles.weatherText, { color: theme.text }]}>
                   {Math.round(weather.temp)}°C • {weather.description}
                 </Text>
-                <Text style={styles.weatherLocation}>{weather.location.city}</Text>
+                <Text style={[styles.weatherLocation, { color: theme.textMuted }]}>
+                  {weather.location.city}
+                </Text>
               </View>
             </BlurView>
           )}
@@ -203,16 +228,22 @@ const ScanResultScreen = () => {
           {/* Care Advice */}
           {careAdvice && (
             <View style={styles.careCard}>
-              <BlurView intensity={45} tint="dark" style={styles.careBlur}>
+              <BlurView intensity={45} tint={theme.blurTint} style={styles.careBlur}>
                 <LinearGradient
-                  colors={['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.85)']}
-                  style={styles.careGradient}
+                  colors={
+                    mode === 'light'
+                      ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                      : ['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.85)']
+                  }
+                  style={[styles.careGradient, { borderColor: theme.border }]}
                 >
                   <View style={styles.careHeader}>
-                    <Ionicons name="sparkles" size={24} color="#c4b5fd" />
-                    <Text style={styles.careTitle}>AI Care Guide</Text>
+                    <Ionicons name="sparkles" size={24} color={theme.iconAccent} />
+                    <Text style={[styles.careTitle, { color: theme.text }]}>AI Care Guide</Text>
                   </View>
-                  <Text style={styles.careText}>{careAdvice}</Text>
+                  <Text style={[styles.careText, { color: theme.textSecondary }]}>
+                    {careAdvice}
+                  </Text>
                 </LinearGradient>
               </BlurView>
             </View>
@@ -243,7 +274,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    color: '#fff',
     fontSize: 18,
   },
   header: {
@@ -258,7 +288,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f9fafb',
   },
   placeholder: {
     width: 40,
@@ -288,11 +317,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.6)',
-    backgroundColor: 'rgba(15,23,42,0.65)',
   },
   confidenceText: {
-    color: '#e5e7eb',
     fontSize: 12,
     fontWeight: '700',
     marginLeft: 4,
@@ -310,17 +336,14 @@ const styles = StyleSheet.create({
   infoGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.45)',
   },
   plantName: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#f9fafb',
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    color: '#cbd5f5',
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -330,15 +353,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: 'rgba(129,140,248,0.25)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: 'rgba(129,140,248,0.7)',
   },
   tagText: {
-    color: '#e5e7eb',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -350,8 +370,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.4)',
-    backgroundColor: 'rgba(15,23,42,0.65)',
   },
   weatherInfo: {
     marginLeft: 12,
@@ -360,11 +378,9 @@ const styles = StyleSheet.create({
   weatherText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#f9fafb',
   },
   weatherLocation: {
     fontSize: 12,
-    color: '#cbd5f5',
     marginTop: 4,
   },
   careCard: {
@@ -380,7 +396,6 @@ const styles = StyleSheet.create({
   careGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.45)',
   },
   careHeader: {
     flexDirection: 'row',
@@ -390,12 +405,10 @@ const styles = StyleSheet.create({
   careTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f9fafb',
     marginLeft: 12,
   },
   careText: {
     fontSize: 14,
-    color: '#e5e7eb',
     lineHeight: 22,
   },
   saveButton: {

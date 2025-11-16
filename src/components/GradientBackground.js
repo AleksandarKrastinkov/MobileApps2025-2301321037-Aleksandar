@@ -9,7 +9,7 @@ const GradientBackground = ({ children, colors, style }) => {
   const { mode } = useThemeMode();
 
   const darkColors = ['#050616', '#141432', '#25194a'];
-  const lightColors = ['#e5e7eb', '#f3e8ff', '#dbeafe'];
+  const lightColors = ['#f8f9fa', '#f1f5f9', '#e2e8f0']; // Softer, warmer light grays
 
   const resolvedColors = colors || (mode === 'dark' ? darkColors : lightColors);
 

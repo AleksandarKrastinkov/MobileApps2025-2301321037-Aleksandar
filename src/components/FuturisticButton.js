@@ -2,6 +2,8 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 
 // A more refined, luxury-style button with soft gradients and subtle depth.
 const FuturisticButton = ({
@@ -13,9 +15,14 @@ const FuturisticButton = ({
   disabled = false,
   style,
 }) => {
+  const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
   const isPrimary = variant === 'primary';
+  
   const colors = isPrimary
-    ? ['#7c3aed', '#a855f7', '#ec4899'] // soft purple/pink gradient
+    ? ['#7c3aed', '#a855f7', '#ec4899'] // soft purple/pink gradient (works on both themes)
+    : mode === 'light'
+    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
     : ['rgba(15,23,42,0.8)', 'rgba(24,24,48,0.9)'];
 
   if (variant === 'outline') {
@@ -23,14 +30,22 @@ const FuturisticButton = ({
       <TouchableOpacity
         onPress={onPress}
         disabled={disabled || loading}
-        style={[styles.outlineButton, style, disabled && styles.disabled]}
+        style={[
+          styles.outlineButton,
+          {
+            borderColor: theme.borderStrong,
+            backgroundColor: mode === 'light' ? 'rgba(255,255,255,0.6)' : 'rgba(15,23,42,0.6)',
+          },
+          style,
+          disabled && styles.disabled,
+        ]}
         activeOpacity={0.85}
       >
-        {icon && <Ionicons name={icon} size={20} color="#e5e7eb" style={styles.icon} />}
+        {icon && <Ionicons name={icon} size={20} color={theme.iconAccent} style={styles.icon} />}
         {loading ? (
-          <ActivityIndicator color="#e5e7eb" />
+          <ActivityIndicator color={theme.iconAccent} />
         ) : (
-          <Text style={styles.outlineButtonText}>{title}</Text>
+          <Text style={[styles.outlineButtonText, { color: theme.iconAccent }]}>{title}</Text>
         )}
       </TouchableOpacity>
     );
@@ -89,14 +104,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(226,232,240,0.5)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(15,23,42,0.6)',
   },
   outlineButtonText: {
-    color: '#e5e7eb',
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 0.8,

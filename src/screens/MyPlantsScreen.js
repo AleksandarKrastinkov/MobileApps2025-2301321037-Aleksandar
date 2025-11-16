@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import GradientBackground from '../components/GradientBackground';
 import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 import PlantCard from '../components/PlantCard';
 import { usePlants } from '../context/PlantContext';
 import FuturisticButton from '../components/FuturisticButton';
@@ -21,6 +22,7 @@ const MyPlantsScreen = () => {
   const { plants, deletePlant } = usePlants();
   const [refreshing, setRefreshing] = useState(false);
   const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
 
   const handleDelete = (plant) => {
     Alert.alert(
@@ -57,25 +59,9 @@ const MyPlantsScreen = () => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons
-        name="leaf-outline"
-        size={80}
-        color={mode === 'dark' ? '#6b7280' : '#9ca3af'}
-      />
-      <Text
-        style={[
-          styles.emptyTitle,
-          { color: mode === 'dark' ? '#f9fafb' : '#111827' },
-        ]}
-      >
-        No Plants Yet
-      </Text>
-      <Text
-        style={[
-          styles.emptyText,
-          { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
-        ]}
-      >
+      <Ionicons name="leaf-outline" size={80} color={theme.textMuted} />
+      <Text style={[styles.emptyTitle, { color: theme.text }]}>No Plants Yet</Text>
+      <Text style={[styles.emptyText, { color: theme.textMuted }]}>
         Start by scanning a plant to add it to your collection
       </Text>
       <FuturisticButton
@@ -92,20 +78,8 @@ const MyPlantsScreen = () => {
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
-          <Text
-            style={[
-              styles.title,
-              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
-            ]}
-          >
-            My Plants
-          </Text>
-          <Text
-            style={[
-              styles.subtitle,
-              { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
-            ]}
-          >
+          <Text style={[styles.title, { color: theme.text }]}>My Plants</Text>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
             {plants.length} in collection
           </Text>
         </View>
@@ -142,12 +116,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#f9fafb',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#cbd5f5',
   },
   list: {
     paddingVertical: 8,
@@ -164,13 +136,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#f9fafb',
     marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#cbd5f5',
     textAlign: 'center',
     marginBottom: 32,
   },
