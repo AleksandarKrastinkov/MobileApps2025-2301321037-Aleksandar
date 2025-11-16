@@ -2,19 +2,28 @@ import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 
 const LoadingOverlay = ({ message = 'Loading...' }) => {
+  const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
+  
   return (
     <View style={styles.overlay}>
-      <BlurView intensity={20} style={styles.blur}>
+      <BlurView intensity={20} tint={theme.blurTint} style={styles.blur}>
         <LinearGradient
-          colors={['#1a1f3a', '#0f1425']}
+          colors={
+            mode === 'light'
+              ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+              : ['#1a1f3a', '#0f1425']
+          }
           style={styles.container}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <ActivityIndicator size="large" color="#00ff88" />
-          <Text style={styles.message}>{message}</Text>
+          <ActivityIndicator size="large" color={theme.accent} />
+          <Text style={[styles.message, { color: theme.text }]}>{message}</Text>
         </LinearGradient>
       </BlurView>
     </View>
@@ -46,7 +55,6 @@ const styles = StyleSheet.create({
   },
   message: {
     marginTop: 16,
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

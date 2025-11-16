@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { usePlants } from '../context/PlantContext';
 import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 import GradientBackground from '../components/GradientBackground';
 import FuturisticButton from '../components/FuturisticButton';
 import { getCurrentWeather } from '../services/weatherService';
@@ -23,6 +24,7 @@ const HomeScreen = () => {
   const { plants } = usePlants();
   const [weather, setWeather] = useState(null);
   const { mode, toggleTheme } = useThemeMode();
+  const theme = getThemeColors(mode);
 
   useEffect(() => {
     loadWeather();
@@ -66,11 +68,25 @@ const HomeScreen = () => {
             </View>
             <View style={styles.headerRight}>
               {weather && (
-                <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
-                  <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
+                <BlurView
+                  intensity={40}
+                  tint={theme.blurTint}
+                  style={[
+                    styles.weatherCard,
+                    {
+                      backgroundColor: theme.card,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                >
+                  <Ionicons name="partly-sunny" size={24} color={theme.iconAccent} />
                   <View style={styles.weatherInfo}>
-                    <Text style={styles.temp}>{Math.round(weather.temp)}°C</Text>
-                    <Text style={styles.weatherDesc}>{weather.description}</Text>
+                    <Text style={[styles.temp, { color: theme.text }]}>
+                      {Math.round(weather.temp)}°C
+                    </Text>
+                    <Text style={[styles.weatherDesc, { color: theme.textMuted }]}>
+                      {weather.description}
+                    </Text>
                   </View>
                 </BlurView>
               )}
@@ -83,18 +99,47 @@ const HomeScreen = () => {
               onPress={toggleTheme}
               activeOpacity={0.9}
             >
-              <BlurView intensity={35} tint="dark" style={styles.themeToggle}>
+              <BlurView
+                intensity={35}
+                tint={theme.blurTint}
+                style={[
+                  styles.themeToggle,
+                  {
+                    backgroundColor: theme.card,
+                    borderColor: theme.borderStrong,
+                  },
+                ]}
+              >
                 <View
                   style={[
                     styles.themeThumb,
+                    {
+                      backgroundColor: mode === 'light' ? 'rgba(124,58,237,0.2)' : 'rgba(15,23,42,0.95)',
+                    },
                     mode === 'dark' ? styles.themeThumbRight : styles.themeThumbLeft,
                   ]}
                 />
                 <View style={styles.themeLabels}>
-                  <Text style={[styles.themeLabel, mode === 'light' && styles.themeLabelActive]}>
+                  <Text
+                    style={[
+                      styles.themeLabel,
+                      {
+                        color: mode === 'light' ? theme.text : theme.textMuted,
+                      },
+                      mode === 'light' && { color: theme.text, fontWeight: '700' },
+                    ]}
+                  >
                     Light
                   </Text>
-                  <Text style={[styles.themeLabel, mode === 'dark' && styles.themeLabelActive]}>
+                  <Text
+                    style={[
+                      styles.themeLabel,
+                      {
+                        color: mode === 'dark' ? theme.text : theme.textMuted,
+                      },
+                      mode === 'dark' && { color: theme.text, fontWeight: '700' },
+                    ]}
+                  >
                     Dark
                   </Text>
                 </View>
@@ -131,23 +176,31 @@ const HomeScreen = () => {
 
           {/* Quick Stats */}
           <View style={styles.statsContainer}>
-            <BlurView intensity={40} tint="dark" style={styles.statCard}>
+            <BlurView intensity={40} tint={theme.blurTint} style={styles.statCard}>
               <LinearGradient
-                colors={['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']}
-                style={styles.statGradient}
+                colors={
+                  mode === 'light'
+                    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                    : ['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']
+                }
+                style={[styles.statGradient, { borderColor: theme.border }]}
               >
-                <Ionicons name="leaf" size={28} color="#c4b5fd" />
-                <Text style={styles.statNumber}>{plants.length}</Text>
-                <Text style={styles.statLabel}>My Plants</Text>
+                <Ionicons name="leaf" size={28} color={theme.iconAccent} />
+                <Text style={[styles.statNumber, { color: theme.text }]}>{plants.length}</Text>
+                <Text style={[styles.statLabel, { color: theme.textMuted }]}>My Plants</Text>
               </LinearGradient>
             </BlurView>
-            <BlurView intensity={40} tint="dark" style={styles.statCard}>
+            <BlurView intensity={40} tint={theme.blurTint} style={styles.statCard}>
               <LinearGradient
-                colors={['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']}
-                style={styles.statGradient}
+                colors={
+                  mode === 'light'
+                    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                    : ['rgba(15,23,42,0.9)', 'rgba(15,23,42,0.6)']
+                }
+                style={[styles.statGradient, { borderColor: theme.border }]}
               >
-                <Ionicons name="water" size={28} color="#a5b4fc" />
-                <Text style={styles.statNumber}>
+                <Ionicons name="water" size={28} color={theme.accentSecondary} />
+                <Text style={[styles.statNumber, { color: theme.text }]}>
                   {plants.filter((p) => {
                     if (!p.lastWatered) return true;
                     const daysSince = Math.floor(
@@ -157,7 +210,7 @@ const HomeScreen = () => {
                     return daysSince >= 3;
                   }).length}
                 </Text>
-                <Text style={styles.statLabel}>Need Water</Text>
+                <Text style={[styles.statLabel, { color: theme.textMuted }]}>Need Water</Text>
               </LinearGradient>
             </BlurView>
           </View>
@@ -195,11 +248,19 @@ const HomeScreen = () => {
                         style={styles.recentPlantImage}
                       />
                     ) : (
-                      <View style={styles.recentPlantPlaceholder}>
-                        <Ionicons name="leaf" size={28} color="#c4b5fd" />
+                      <View
+                        style={[
+                          styles.recentPlantPlaceholder,
+                          {
+                            backgroundColor: theme.card,
+                            borderColor: theme.border,
+                          },
+                        ]}
+                      >
+                        <Ionicons name="leaf" size={28} color={theme.iconAccent} />
                       </View>
                     )}
-                    <Text style={styles.recentPlantName} numberOfLines={1}>
+                    <Text style={[styles.recentPlantName, { color: theme.text }]} numberOfLines={1}>
                       {plant.name}
                     </Text>
                   </TouchableOpacity>
@@ -210,33 +271,38 @@ const HomeScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: mode === 'dark' ? '#ffffff' : '#111827' },
-              ]}
-            >
-              Quick Actions
-            </Text>
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>Quick Actions</Text>
             <View style={styles.actionsGrid}>
-              <BlurView intensity={35} tint="dark" style={styles.actionCard}>
+              <BlurView intensity={35} tint={theme.blurTint} style={styles.actionCard}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('MyPlants')}
-                  style={styles.actionInner}
+                  style={[
+                    styles.actionInner,
+                    {
+                      backgroundColor: theme.card,
+                      borderColor: theme.border,
+                    },
+                  ]}
                   activeOpacity={0.9}
                 >
-                  <Ionicons name="library" size={24} color="#e5e7eb" />
-                  <Text style={styles.actionText}>My Collection</Text>
+                  <Ionicons name="library" size={24} color={theme.iconAccent} />
+                  <Text style={[styles.actionText, { color: theme.text }]}>My Collection</Text>
                 </TouchableOpacity>
               </BlurView>
-              <BlurView intensity={35} tint="dark" style={styles.actionCard}>
+              <BlurView intensity={35} tint={theme.blurTint} style={styles.actionCard}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('CareGuide')}
-                  style={styles.actionInner}
+                  style={[
+                    styles.actionInner,
+                    {
+                      backgroundColor: theme.card,
+                      borderColor: theme.border,
+                    },
+                  ]}
                   activeOpacity={0.9}
                 >
-                  <Ionicons name="book" size={24} color="#e5e7eb" />
-                  <Text style={styles.actionText}>Care Guide</Text>
+                  <Ionicons name="book" size={24} color={theme.iconAccent} />
+                  <Text style={[styles.actionText, { color: theme.text }]}>Care Guide</Text>
                 </TouchableOpacity>
               </BlurView>
             </View>
@@ -280,8 +346,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.6)',
-    backgroundColor: 'rgba(15,23,42,0.7)',
     overflow: 'hidden',
   },
   themeThumb: {
@@ -290,7 +354,6 @@ const styles = StyleSheet.create({
     bottom: 3,
     width: '50%',
     borderRadius: 999,
-    backgroundColor: 'rgba(15,23,42,0.95)',
     shadowColor: '#020617',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
@@ -312,20 +375,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontWeight: '600',
-    color: '#9ca3af',
-  },
-  themeLabelActive: {
-    color: '#f9fafb',
   },
   greeting: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#9ca3af',
   },
   weatherCard: {
     flexDirection: 'row',
@@ -334,8 +391,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.4)',
-    backgroundColor: 'rgba(15,23,42,0.6)',
     marginLeft: 'auto',
   },
   weatherInfo: {
@@ -344,11 +399,9 @@ const styles = StyleSheet.create({
   temp: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f9fafb',
   },
   weatherDesc: {
     fontSize: 12,
-    color: '#cbd5f5',
     textTransform: 'capitalize',
   },
   mainCard: {
@@ -419,17 +472,14 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.35)',
   },
   statNumber: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#e5e7eb',
     marginTop: 8,
   },
   statLabel: {
     fontSize: 12,
-    color: '#9ca3af',
     marginTop: 4,
   },
   section: {
@@ -438,7 +488,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#fff',
     marginBottom: 16,
     paddingHorizontal: 20,
   },
@@ -460,16 +509,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 15,
-    backgroundColor: 'rgba(15,23,42,0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.35)',
   },
   recentPlantName: {
     fontSize: 12,
-    color: '#e5e7eb',
     textAlign: 'center',
     maxWidth: 80,
   },
@@ -490,13 +536,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.4)',
-    backgroundColor: 'rgba(15,23,42,0.6)',
   },
   actionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#e5e7eb',
     marginTop: 8,
   },
 });

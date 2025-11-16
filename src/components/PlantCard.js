@@ -3,18 +3,26 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 
 const PlantCard = ({ plant, onPress, onDelete }) => {
+  const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
   return (
     <TouchableOpacity
       onPress={onPress}
       style={styles.cardContainer}
       activeOpacity={0.9}
     >
-      <BlurView intensity={45} tint="dark" style={styles.blur}>
+      <BlurView intensity={45} tint={theme.blurTint} style={styles.blur}>
         <LinearGradient
-          colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.7)']}
-          style={styles.gradient}
+          colors={
+            mode === 'light'
+              ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+              : ['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.7)']
+          }
+          style={[styles.gradient, { borderColor: theme.border }]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
@@ -23,7 +31,7 @@ const PlantCard = ({ plant, onPress, onDelete }) => {
           )}
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={styles.name} numberOfLines={1}>
+              <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
                 {plant.name || 'Unknown Plant'}
               </Text>
               {onDelete && (
@@ -34,19 +42,19 @@ const PlantCard = ({ plant, onPress, onDelete }) => {
                   }}
                   style={styles.deleteButton}
                 >
-                  <Ionicons name="trash-outline" size={18} color="#fb7185" />
+                  <Ionicons name="trash-outline" size={18} color={theme.error} />
                 </TouchableOpacity>
               )}
             </View>
             {plant.species && (
-              <Text style={styles.species} numberOfLines={1}>
+              <Text style={[styles.species, { color: theme.iconAccent }]} numberOfLines={1}>
                 {plant.species}
               </Text>
             )}
             {plant.lastWatered && (
               <View style={styles.infoRow}>
-                <Ionicons name="water" size={14} color="#a5b4fc" />
-                <Text style={styles.infoText}>
+                <Ionicons name="water" size={14} color={theme.iconAccent} />
+                <Text style={[styles.infoText, { color: theme.textMuted }]}>
                   Last watered: {new Date(plant.lastWatered).toLocaleDateString()}
                 </Text>
               </View>
@@ -79,6 +87,7 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
   },
   image: {
     width: 80,
@@ -99,7 +108,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f9fafb',
     flex: 1,
   },
   deleteButton: {
@@ -107,7 +115,6 @@ const styles = StyleSheet.create({
   },
   species: {
     fontSize: 14,
-    color: '#c4b5fd',
     marginBottom: 8,
   },
   infoRow: {
@@ -116,7 +123,6 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 12,
-    color: '#cbd5f5',
     marginLeft: 6,
   },
   glow: {

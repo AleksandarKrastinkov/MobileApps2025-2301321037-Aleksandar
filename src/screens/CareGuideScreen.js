@@ -12,9 +12,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
 import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 
 const CareGuideScreen = () => {
   const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
   const [expandedSection, setExpandedSection] = useState(null);
 
   const careTopics = [
@@ -125,20 +127,8 @@ Wilting:
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
-          <Text
-            style={[
-              styles.title,
-              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
-            ]}
-          >
-            Care Guide
-          </Text>
-          <Text
-            style={[
-              styles.subtitle,
-              { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
-            ]}
-          >
+          <Text style={[styles.title, { color: theme.text }]}>Care Guide</Text>
+          <Text style={[styles.subtitle, { color: theme.textMuted }]}>
             Essential plant care knowledge
           </Text>
         </View>
@@ -154,31 +144,57 @@ Wilting:
               style={styles.topicCard}
               activeOpacity={0.9}
             >
-              <BlurView intensity={45} tint="dark" style={styles.topicBlur}>
+              <BlurView intensity={45} tint={theme.blurTint} style={styles.topicBlur}>
                 <LinearGradient
-                  colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']}
-                  style={styles.topicGradient}
+                  colors={
+                    mode === 'light'
+                      ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                      : ['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']
+                  }
+                  style={[styles.topicGradient, { borderColor: theme.border }]}
                 >
                   <View style={styles.topicHeader}>
                     <View style={styles.topicHeaderLeft}>
-                      <View style={styles.iconContainer}>
-                        <Ionicons name={topic.icon} size={24} color="#c4b5fd" />
+                      <View
+                        style={[
+                          styles.iconContainer,
+                          {
+                            backgroundColor:
+                              mode === 'light'
+                                ? 'rgba(124,58,237,0.15)'
+                                : 'rgba(129,140,248,0.25)',
+                          },
+                        ]}
+                      >
+                        <Ionicons name={topic.icon} size={24} color={theme.iconAccent} />
                       </View>
-                      <Text style={styles.topicTitle}>{topic.title}</Text>
+                      <Text style={[styles.topicTitle, { color: theme.text }]}>
+                        {topic.title}
+                      </Text>
                     </View>
                     <Ionicons
                       name={
-                        expandedSection === topic.id
-                          ? 'chevron-up'
-                          : 'chevron-down'
+                        expandedSection === topic.id ? 'chevron-up' : 'chevron-down'
                       }
                       size={24}
-                      color="#e5e7eb"
+                      color={theme.icon}
                     />
                   </View>
                   {expandedSection === topic.id && (
-                    <View style={styles.topicContent}>
-                      <Text style={styles.topicText}>{topic.content}</Text>
+                    <View
+                      style={[
+                        styles.topicContent,
+                        {
+                          borderTopColor:
+                            mode === 'light'
+                              ? 'rgba(124,58,237,0.2)'
+                              : 'rgba(0, 255, 136, 0.3)',
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.topicText, { color: theme.textSecondary }]}>
+                        {topic.content}
+                      </Text>
                     </View>
                   )}
                 </LinearGradient>
@@ -188,14 +204,16 @@ Wilting:
 
           {/* Tips Section */}
           <View style={styles.tipsCard}>
-            <BlurView intensity={50} tint="dark" style={styles.tipsBlur}>
+            <BlurView intensity={50} tint={theme.blurTint} style={styles.tipsBlur}>
               <LinearGradient
                 colors={['#7c3aed', '#a855f7', '#ec4899']}
                 style={styles.tipsGradient}
               >
-                <Ionicons name="bulb" size={32} color="#0b1120" />
-                <Text style={styles.tipsTitle}>Pro Tips</Text>
-                <Text style={styles.tipsText}>
+                <Ionicons name="bulb" size={32} color={mode === 'light' ? '#1e293b' : '#0b1120'} />
+                <Text style={[styles.tipsTitle, { color: mode === 'light' ? '#1e293b' : '#0b1120' }]}>
+                  Pro Tips
+                </Text>
+                <Text style={[styles.tipsText, { color: mode === 'light' ? '#1e293b' : '#0b1120' }]}>
                 • Rotate plants weekly for even growth{'\n'}
                 • Clean leaves regularly to maximize light absorption{'\n'}
                 • Repot when roots fill the container{'\n'}
@@ -223,12 +241,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#f9fafb',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#cbd5f5',
   },
   scrollContent: {
     paddingBottom: 40,
@@ -246,7 +262,6 @@ const styles = StyleSheet.create({
   topicGradient: {
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.45)',
   },
   topicHeader: {
     flexDirection: 'row',
@@ -262,7 +277,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(129,140,248,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -270,18 +284,15 @@ const styles = StyleSheet.create({
   topicTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#f9fafb',
     flex: 1,
   },
   topicContent: {
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 255, 136, 0.3)',
   },
   topicText: {
     fontSize: 14,
-    color: '#e5e7eb',
     lineHeight: 22,
   },
   tipsCard: {
@@ -302,13 +313,11 @@ const styles = StyleSheet.create({
   tipsTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#0b1120',
     marginTop: 12,
     marginBottom: 16,
   },
   tipsText: {
     fontSize: 14,
-    color: '#0b1120',
     lineHeight: 24,
     textAlign: 'center',
     fontWeight: '600',

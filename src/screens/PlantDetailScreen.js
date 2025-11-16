@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
 import { useThemeMode } from '../context/ThemeContext';
+import { getThemeColors } from '../theme/colors';
 import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { usePlants } from '../context/PlantContext';
@@ -35,6 +36,7 @@ const PlantDetailScreen = () => {
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState('');
   const { mode } = useThemeMode();
+  const theme = getThemeColors(mode);
 
   useEffect(() => {
     loadPlant();
@@ -162,20 +164,9 @@ const PlantDetailScreen = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={mode === 'dark' ? '#f9fafb' : '#111827'}
-            />
+            <Ionicons name="arrow-back" size={24} color={theme.text} />
           </TouchableOpacity>
-          <Text
-            style={[
-              styles.headerTitle,
-              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
-            ]}
-          >
-            Plant Details
-          </Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>Plant Details</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -192,14 +183,20 @@ const PlantDetailScreen = () => {
 
           {/* Plant Name */}
           <View style={styles.nameCard}>
-            <BlurView intensity={45} tint="dark" style={styles.nameBlur}>
+            <BlurView intensity={45} tint={theme.blurTint} style={styles.nameBlur}>
               <LinearGradient
-                colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.7)']}
-                style={styles.nameGradient}
+                colors={
+                  mode === 'light'
+                    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                    : ['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.7)']
+                }
+                style={[styles.nameGradient, { borderColor: theme.border }]}
               >
-                <Text style={styles.plantName}>{plant.name}</Text>
+                <Text style={[styles.plantName, { color: theme.text }]}>{plant.name}</Text>
                 {plant.species && (
-                  <Text style={styles.species}>{plant.species}</Text>
+                  <Text style={[styles.species, { color: theme.iconAccent }]}>
+                    {plant.species}
+                  </Text>
                 )}
               </LinearGradient>
             </BlurView>
@@ -207,7 +204,7 @@ const PlantDetailScreen = () => {
 
           {/* Quick Actions */}
           <View style={styles.actionsContainer}>
-            <BlurView intensity={40} tint="dark" style={styles.actionButton}>
+            <BlurView intensity={40} tint={theme.blurTint} style={styles.actionButton}>
               <TouchableOpacity onPress={handleWaterPlant} style={styles.actionInner}>
                 <LinearGradient
                   colors={['#22c55e', '#4ade80']}
@@ -220,14 +217,22 @@ const PlantDetailScreen = () => {
                 </LinearGradient>
               </TouchableOpacity>
             </BlurView>
-            <BlurView intensity={40} tint="dark" style={styles.actionButton}>
+            <BlurView intensity={40} tint={theme.blurTint} style={styles.actionButton}>
               <TouchableOpacity onPress={handleDetectIssues} style={styles.actionInner}>
                 <LinearGradient
-                  colors={['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']}
-                  style={[styles.actionGradient, styles.actionGradientOutline]}
+                  colors={
+                    mode === 'light'
+                      ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                      : ['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']
+                  }
+                  style={[
+                    styles.actionGradient,
+                    styles.actionGradientOutline,
+                    { borderColor: theme.borderStrong },
+                  ]}
                 >
-                  <Ionicons name="medical" size={22} color="#c4b5fd" />
-                  <Text style={[styles.actionText, styles.actionTextOutline]}>
+                  <Ionicons name="medical" size={22} color={theme.iconAccent} />
+                  <Text style={[styles.actionText, styles.actionTextOutline, { color: theme.iconAccent }]}>
                     Check Health
                   </Text>
                 </LinearGradient>
@@ -237,19 +242,27 @@ const PlantDetailScreen = () => {
 
           {/* Watering Status */}
           {daysSinceWatered !== null && (
-            <BlurView intensity={40} tint="dark" style={styles.statusCard}>
+            <BlurView
+              intensity={40}
+              tint={theme.blurTint}
+              style={[
+                styles.statusCard,
+                {
+                  backgroundColor: theme.card,
+                  borderColor: theme.border,
+                },
+              ]}
+            >
               <Ionicons
                 name={daysSinceWatered >= 3 ? 'warning' : 'checkmark-circle'}
                 size={24}
-                color={daysSinceWatered >= 3 ? '#fbbf24' : '#4ade80'}
+                color={daysSinceWatered >= 3 ? theme.warning : theme.success}
               />
               <View style={styles.statusInfo}>
-                <Text style={styles.statusTitle}>
-                  {daysSinceWatered >= 3
-                    ? 'Needs Watering'
-                    : 'Recently Watered'}
+                <Text style={[styles.statusTitle, { color: theme.text }]}>
+                  {daysSinceWatered >= 3 ? 'Needs Watering' : 'Recently Watered'}
                 </Text>
-                <Text style={styles.statusText}>
+                <Text style={[styles.statusText, { color: theme.textMuted }]}>
                   {daysSinceWatered === 0
                     ? 'Watered today'
                     : daysSinceWatered === 1
@@ -262,13 +275,25 @@ const PlantDetailScreen = () => {
 
           {/* Weather Info */}
           {weather && (
-            <BlurView intensity={40} tint="dark" style={styles.weatherCard}>
-              <Ionicons name="partly-sunny" size={24} color="#e5e7eb" />
+            <BlurView
+              intensity={40}
+              tint={theme.blurTint}
+              style={[
+                styles.weatherCard,
+                {
+                  backgroundColor: theme.card,
+                  borderColor: theme.border,
+                },
+              ]}
+            >
+              <Ionicons name="partly-sunny" size={24} color={theme.iconAccent} />
               <View style={styles.weatherInfo}>
-                <Text style={styles.weatherText}>
+                <Text style={[styles.weatherText, { color: theme.text }]}>
                   {Math.round(weather.temp)}°C • {weather.description}
                 </Text>
-                <Text style={styles.weatherLocation}>{weather.location.city}</Text>
+                <Text style={[styles.weatherLocation, { color: theme.textMuted }]}>
+                  {weather.location.city}
+                </Text>
               </View>
             </BlurView>
           )}
@@ -276,16 +301,22 @@ const PlantDetailScreen = () => {
           {/* Care Advice */}
           {careAdvice && (
             <View style={styles.careCard}>
-              <BlurView intensity={45} tint="dark" style={styles.careBlur}>
+              <BlurView intensity={45} tint={theme.blurTint} style={styles.careBlur}>
                 <LinearGradient
-                  colors={['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']}
-                  style={styles.careGradient}
+                  colors={
+                    mode === 'light'
+                      ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                      : ['rgba(15,23,42,0.95)', 'rgba(76,29,149,0.9)']
+                  }
+                  style={[styles.careGradient, { borderColor: theme.border }]}
                 >
                   <View style={styles.careHeader}>
-                    <Ionicons name="sparkles" size={24} color="#c4b5fd" />
-                    <Text style={styles.careTitle}>Care Instructions</Text>
+                    <Ionicons name="sparkles" size={24} color={theme.iconAccent} />
+                    <Text style={[styles.careTitle, { color: theme.text }]}>Care Instructions</Text>
                   </View>
-                  <Text style={styles.careText}>{careAdvice}</Text>
+                  <Text style={[styles.careText, { color: theme.textSecondary }]}>
+                    {careAdvice}
+                  </Text>
                 </LinearGradient>
               </BlurView>
             </View>
@@ -294,16 +325,20 @@ const PlantDetailScreen = () => {
           {/* Issues Detection */}
           {issues && (
             <View style={styles.issuesCard}>
-              <BlurView intensity={45} tint="dark" style={styles.issuesBlur}>
+              <BlurView intensity={45} tint={theme.blurTint} style={styles.issuesBlur}>
                 <LinearGradient
-                  colors={['rgba(15,23,42,0.95)', 'rgba(190,24,93,0.9)']}
-                  style={styles.issuesGradient}
+                  colors={
+                    mode === 'light'
+                      ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                      : ['rgba(15,23,42,0.95)', 'rgba(190,24,93,0.9)']
+                  }
+                  style={[styles.issuesGradient, { borderColor: theme.border }]}
                 >
                   <View style={styles.issuesHeader}>
-                    <Ionicons name="medical" size={24} color="#facc15" />
-                    <Text style={styles.issuesTitle}>Health Analysis</Text>
+                    <Ionicons name="medical" size={24} color={theme.warning} />
+                    <Text style={[styles.issuesTitle, { color: theme.text }]}>Health Analysis</Text>
                   </View>
-                  <Text style={styles.issuesText}>{issues}</Text>
+                  <Text style={[styles.issuesText, { color: theme.textSecondary }]}>{issues}</Text>
                 </LinearGradient>
               </BlurView>
             </View>
@@ -311,32 +346,43 @@ const PlantDetailScreen = () => {
 
           {/* Notes */}
           <View style={styles.notesCard}>
-            <BlurView intensity={45} tint="dark" style={styles.notesBlur}>
+            <BlurView intensity={45} tint={theme.blurTint} style={styles.notesBlur}>
               <LinearGradient
-                colors={['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']}
-                style={styles.notesGradient}
+                colors={
+                  mode === 'light'
+                    ? ['rgba(255,255,255,0.95)', 'rgba(248,250,252,0.9)']
+                    : ['rgba(15,23,42,0.95)', 'rgba(30,64,175,0.8)']
+                }
+                style={[styles.notesGradient, { borderColor: theme.border }]}
               >
               <View style={styles.notesHeader}>
-                <Ionicons name="document-text" size={24} color="#00ff88" />
-                <Text style={styles.notesTitle}>Notes</Text>
+                <Ionicons name="document-text" size={24} color={theme.success} />
+                <Text style={[styles.notesTitle, { color: theme.text }]}>Notes</Text>
                 {!editingNotes && (
                   <TouchableOpacity
                     onPress={() => setEditingNotes(true)}
                     style={styles.editButton}
                   >
-                    <Ionicons name="pencil" size={18} color="#c4b5fd" />
+                    <Ionicons name="pencil" size={18} color={theme.iconAccent} />
                   </TouchableOpacity>
                 )}
               </View>
               {editingNotes ? (
                 <View>
                   <TextInput
-                    style={styles.notesInput}
+                    style={[
+                      styles.notesInput,
+                      {
+                        color: theme.text,
+                        borderColor: theme.border,
+                        backgroundColor: mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(15,23,42,0.5)',
+                      },
+                    ]}
                     value={notes}
                     onChangeText={setNotes}
                     multiline
                     placeholder="Add notes about your plant..."
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor={theme.textMuted}
                   />
                   <View style={styles.notesActions}>
                     <TouchableOpacity
@@ -357,7 +403,7 @@ const PlantDetailScreen = () => {
                   </View>
                 </View>
               ) : (
-                <Text style={styles.notesText}>
+                <Text style={[styles.notesText, { color: theme.textMuted }]}>
                   {notes || 'No notes yet. Tap the edit icon to add notes.'}
                 </Text>
               )}
@@ -381,7 +427,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
-    color: '#fff',
     fontSize: 18,
   },
   header: {
@@ -396,7 +441,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f9fafb',
   },
   placeholder: {
     width: 40,
@@ -427,17 +471,14 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.45)',
   },
   plantName: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#f9fafb',
     marginBottom: 4,
   },
   species: {
     fontSize: 16,
-    color: '#c4b5fd',
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -462,17 +503,13 @@ const styles = StyleSheet.create({
   },
   actionGradientOutline: {
     borderWidth: 1,
-    borderColor: 'rgba(129,140,248,0.7)',
   },
   actionText: {
-    color: '#f9fafb',
     fontSize: 14,
     fontWeight: '700',
     marginTop: 8,
   },
-  actionTextOutline: {
-    color: '#e5e7eb',
-  },
+  actionTextOutline: {},
   statusCard: {
     flexDirection: 'row',
     alignItems: 'center',
