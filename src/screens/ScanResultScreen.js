@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
+import { useThemeMode } from '../context/ThemeContext';
 import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { usePlants } from '../context/PlantContext';
@@ -29,6 +30,7 @@ const ScanResultScreen = () => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { mode } = useThemeMode();
 
   useEffect(() => {
     loadCareAdvice();
@@ -93,7 +95,14 @@ const ScanResultScreen = () => {
       <GradientBackground>
         <SafeAreaView style={styles.container}>
           <View style={styles.centerContent}>
-            <Text style={styles.text}>No plant data available</Text>
+            <Text
+              style={[
+                styles.text,
+                { color: mode === 'dark' ? '#ffffff' : '#111827' },
+              ]}
+            >
+              No plant data available
+            </Text>
             <FuturisticButton
               title="Go Back"
               onPress={() => navigation.goBack()}
@@ -116,9 +125,20 @@ const ScanResultScreen = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Ionicons name="arrow-back" size={24} color="#f9fafb" />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={mode === 'dark' ? '#f9fafb' : '#111827'}
+            />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Plant Identified</Text>
+          <Text
+            style={[
+              styles.headerTitle,
+              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
+            ]}
+          >
+            Plant Identified
+          </Text>
           <View style={styles.placeholder} />
         </View>
 

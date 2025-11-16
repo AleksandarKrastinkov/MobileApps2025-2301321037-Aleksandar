@@ -11,8 +11,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
+import { useThemeMode } from '../context/ThemeContext';
 
 const CareGuideScreen = () => {
+  const { mode } = useThemeMode();
   const [expandedSection, setExpandedSection] = useState(null);
 
   const careTopics = [
@@ -123,8 +125,22 @@ Wilting:
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Care Guide</Text>
-          <Text style={styles.subtitle}>Essential plant care knowledge</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: mode === 'dark' ? '#f9fafb' : '#111827' },
+            ]}
+          >
+            Care Guide
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              { color: mode === 'dark' ? '#cbd5f5' : '#4b5563' },
+            ]}
+          >
+            Essential plant care knowledge
+          </Text>
         </View>
 
         <ScrollView

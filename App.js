@@ -6,20 +6,31 @@ import { TamaguiProvider, Theme } from 'tamagui';
 import config from './tamagui.config';
 import MainNavigator from './src/navigation/MainNavigator';
 import { PlantProvider } from './src/context/PlantContext';
+import { ThemeModeProvider, useThemeMode } from './src/context/ThemeContext';
+
+const Root = () => {
+  const { mode } = useThemeMode();
+
+  return (
+    <TamaguiProvider config={config}>
+      <Theme name={mode}>
+        <PlantProvider>
+          <NavigationContainer>
+            <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+            <MainNavigator />
+          </NavigationContainer>
+        </PlantProvider>
+      </Theme>
+    </TamaguiProvider>
+  );
+};
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TamaguiProvider config={config}>
-        <Theme name="dark">
-          <PlantProvider>
-            <NavigationContainer>
-              <StatusBar style="light" />
-              <MainNavigator />
-            </NavigationContainer>
-          </PlantProvider>
-        </Theme>
-      </TamaguiProvider>
+      <ThemeModeProvider>
+        <Root />
+      </ThemeModeProvider>
     </GestureHandlerRootView>
   );
 }
