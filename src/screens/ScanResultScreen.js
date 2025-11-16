@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import GradientBackground from '../components/GradientBackground';
@@ -20,7 +20,7 @@ import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { usePlants } from '../context/PlantContext';
 import { getCareAdvice } from '../services/openaiService';
-import { getCurrentWeather } from '../services/weatherService';
+import { getWateringFrequency } from '../utils/wateringSchedule';
 
 const ScanResultScreen = () => {
   const navigation = useNavigation();
@@ -28,7 +28,6 @@ const ScanResultScreen = () => {
   const { imageUri, plantData } = route.params || {};
   const { addPlant } = usePlants();
   const [careAdvice, setCareAdvice] = useState(null);
-  const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const { mode } = useThemeMode();
@@ -36,19 +35,16 @@ const ScanResultScreen = () => {
 
   useEffect(() => {
     loadCareAdvice();
-    loadWeather();
   }, []);
 
   const loadCareAdvice = async () => {
     if (!plantData) return;
     setLoading(true);
     try {
-      const weatherData = await getCurrentWeather();
-      setWeather(weatherData);
       const advice = await getCareAdvice(
         plantData.name,
         plantData.perenualData || plantData.kindwiseData,
-        weatherData
+        null // No weather data needed
       );
       setCareAdvice(advice);
     } catch (error) {
@@ -59,31 +55,57 @@ const ScanResultScreen = () => {
     }
   };
 
-  const loadWeather = async () => {
-    try {
-      const weatherData = await getCurrentWeather();
-      setWeather(weatherData);
-    } catch (error) {
-      console.error('Error loading weather:', error);
-    }
-  };
 
   const handleSavePlant = async () => {
     if (!plantData || !imageUri) return;
 
     setSaving(true);
     try {
+      const species = plantData.kindwiseData?.plant_details?.common_names?.[0] || plantData.name;
+      const wateringFrequency = getWateringFrequency(plantData.name, species);
+      
       await addPlant({
         name: plantData.name,
-        species: plantData.kindwiseData?.plant_details?.common_names?.[0] || plantData.name,
+        species: species,
         imageUri: imageUri,
         confidence: plantData.confidence,
         plantData: plantData,
         careAdvice: careAdvice,
         lastWatered: null,
+        wateringFrequency: wateringFrequency,
       });
       Alert.alert('Success', 'Plant saved to your collection!', [
-        { text: 'OK', onPress: () => navigation.navigate('MyPlants') },
+        {
+          text: 'OK',
+          onPress: () => {
+            // Get the root navigator (Tab navigator)
+            const rootNavigation = navigation.getParent()?.getParent();
+            
+            if (rootNavigation) {
+              // Reset the Home stack first to remove Camera and ScanResult
+              const homeStackNavigation = navigation.getParent();
+              if (homeStackNavigation) {
+                homeStackNavigation.reset({
+                  index: 0,
+                  routes: [{ name: 'HomeMain' }],
+                });
+              }
+              
+              // Then navigate to MyPlants tab
+              rootNavigation.navigate('MyPlants');
+            } else {
+              // Fallback: reset Home stack and navigate to MyPlants
+              const homeStackNavigation = navigation.getParent();
+              if (homeStackNavigation) {
+                homeStackNavigation.reset({
+                  index: 0,
+                  routes: [{ name: 'HomeMain' }],
+                });
+              }
+              navigation.navigate('MyPlants');
+            }
+          },
+        },
       ]);
     } catch (error) {
       Alert.alert('Error', 'Failed to save plant');
@@ -200,30 +222,6 @@ const ScanResultScreen = () => {
             </BlurView>
           </View>
 
-          {/* Weather Info */}
-          {weather && (
-            <BlurView
-              intensity={40}
-              tint={theme.blurTint}
-              style={[
-                styles.weatherCard,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Ionicons name="partly-sunny" size={24} color={theme.iconAccent} />
-              <View style={styles.weatherInfo}>
-                <Text style={[styles.weatherText, { color: theme.text }]}>
-                  {Math.round(weather.temp)}°C • {weather.description}
-                </Text>
-                <Text style={[styles.weatherLocation, { color: theme.textMuted }]}>
-                  {weather.location.city}
-                </Text>
-              </View>
-            </BlurView>
-          )}
 
           {/* Care Advice */}
           {careAdvice && (
@@ -248,6 +246,28 @@ const ScanResultScreen = () => {
               </BlurView>
             </View>
           )}
+
+          {/* Action Buttons */}
+          <View style={styles.actionButtonsContainer}>
+            <FuturisticButton
+              title="Go Back"
+              icon="arrow-back"
+              variant="outline"
+              onPress={() => navigation.goBack()}
+              style={styles.actionButton}
+            />
+            <FuturisticButton
+              title="Try Again"
+              icon="camera"
+              variant="outline"
+              onPress={() => {
+                // Go back to Camera screen to retake picture
+                // This will pop ScanResult and return to Camera
+                navigation.goBack();
+              }}
+              style={styles.actionButton}
+            />
+          </View>
 
           {/* Save Button */}
           <FuturisticButton
@@ -362,27 +382,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  weatherCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    padding: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-  },
-  weatherInfo: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  weatherText: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  weatherLocation: {
-    fontSize: 12,
-    marginTop: 4,
-  },
   careCard: {
     marginHorizontal: 20,
     marginBottom: 20,
@@ -410,6 +409,15 @@ const styles = StyleSheet.create({
   careText: {
     fontSize: 14,
     lineHeight: 22,
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 12,
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
   },
   saveButton: {
     marginHorizontal: 20,

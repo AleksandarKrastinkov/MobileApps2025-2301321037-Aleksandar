@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import GradientBackground from '../components/GradientBackground';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { identifyPlant } from '../services/plantIdentification';
@@ -22,6 +22,14 @@ const CameraScreen = () => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const cameraRef = useRef(null);
+
+  // Reset loading state when screen comes into focus (e.g., when navigating back)
+  useFocusEffect(
+    useCallback(() => {
+      // Reset loading state when screen is focused
+      setLoading(false);
+    }, [])
+  );
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -48,15 +56,18 @@ const CameraScreen = () => {
     setLoading(true);
     try {
       const result = await identifyPlant(capturedImage);
+      setLoading(false); // Reset loading before navigation
       navigation.navigate('ScanResult', {
         imageUri: capturedImage,
         plantData: result,
       });
     } catch (error) {
+      console.error('Error analyzing plant:', error);
+      setLoading(false);
       Alert.alert(
         'Error',
         'Failed to identify plant. Please try again.',
-        [{ text: 'OK', onPress: () => setLoading(false) }]
+        [{ text: 'OK' }]
       );
     }
   };

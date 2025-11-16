@@ -34,18 +34,24 @@ const PlantCard = ({ plant, onPress, onDelete }) => {
               <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
                 {plant.name || 'Unknown Plant'}
               </Text>
-              {onDelete && (
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onDelete();
-                  }}
-                  style={styles.deleteButton}
-                >
-                  <Ionicons name="trash-outline" size={18} color={theme.error} />
-                </TouchableOpacity>
-              )}
             </View>
+            {onDelete && (
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                style={[
+                  styles.deleteButton,
+                  {
+                    backgroundColor: mode === 'light' ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.2)',
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="trash-outline" size={20} color={theme.error} />
+              </TouchableOpacity>
+            )}
             {plant.species && (
               <Text style={[styles.species, { color: theme.iconAccent }]} numberOfLines={1}>
                 {plant.species}
@@ -88,6 +94,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
+    position: 'relative',
   },
   image: {
     width: 80,
@@ -101,7 +108,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
   },
@@ -111,7 +117,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deleteButton: {
-    padding: 4,
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 10,
+    borderRadius: 12,
+    minWidth: 40,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
   },
   species: {
     fontSize: 14,

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,31 +18,10 @@ import FuturisticButton from '../components/FuturisticButton';
 
 const MyPlantsScreen = () => {
   const navigation = useNavigation();
-  const { plants, deletePlant } = usePlants();
+  const { plants } = usePlants();
   const [refreshing, setRefreshing] = useState(false);
   const { mode } = useThemeMode();
   const theme = getThemeColors(mode);
-
-  const handleDelete = (plant) => {
-    Alert.alert(
-      'Delete Plant',
-      `Are you sure you want to remove ${plant.name} from your collection?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deletePlant(plant.id);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete plant');
-            }
-          },
-        },
-      ]
-    );
-  };
 
   const handlePlantPress = (plant) => {
     navigation.navigate('PlantDetail', { plantId: plant.id });
@@ -53,7 +31,6 @@ const MyPlantsScreen = () => {
     <PlantCard
       plant={item}
       onPress={() => handlePlantPress(item)}
-      onDelete={() => handleDelete(item)}
     />
   );
 

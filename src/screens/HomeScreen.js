@@ -114,7 +114,11 @@ const HomeScreen = () => {
                   style={[
                     styles.themeThumb,
                     {
-                      backgroundColor: mode === 'light' ? 'rgba(124,58,237,0.2)' : 'rgba(15,23,42,0.95)',
+                      backgroundColor: mode === 'light' 
+                        ? 'rgba(124,58,237,0.2)' 
+                        : 'rgba(124,58,237,0.4)',
+                      borderWidth: mode === 'dark' ? 1 : 0,
+                      borderColor: mode === 'dark' ? 'rgba(124,58,237,0.6)' : 'transparent',
                     },
                     mode === 'dark' ? styles.themeThumbRight : styles.themeThumbLeft,
                   ]}

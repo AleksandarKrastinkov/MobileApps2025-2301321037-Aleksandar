@@ -21,17 +21,21 @@ import FuturisticButton from '../components/FuturisticButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { usePlants } from '../context/PlantContext';
 import { getCareAdvice, detectPlantIssues } from '../services/openaiService';
-import { getCurrentWeather } from '../services/weatherService';
+import {
+  getWateringFrequency,
+  canWaterPlant,
+  formatNextWateringMessage,
+  getTimeUntilNextWatering,
+} from '../utils/wateringSchedule';
 
 const PlantDetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { plantId } = route.params || {};
-  const { getPlantById, updatePlant } = usePlants();
+  const { getPlantById, updatePlant, deletePlant } = usePlants();
   const [plant, setPlant] = useState(null);
   const [careAdvice, setCareAdvice] = useState(null);
   const [issues, setIssues] = useState(null);
-  const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState('');
@@ -40,7 +44,6 @@ const PlantDetailScreen = () => {
 
   useEffect(() => {
     loadPlant();
-    loadWeather();
   }, [plantId]);
 
   const loadPlant = () => {
@@ -56,23 +59,35 @@ const PlantDetailScreen = () => {
     }
   };
 
-  const loadWeather = async () => {
-    try {
-      const weatherData = await getCurrentWeather();
-      setWeather(weatherData);
-    } catch (error) {
-      console.error('Error loading weather:', error);
-    }
+  const handleDeletePlant = () => {
+    Alert.alert(
+      'Delete Plant',
+      `Are you sure you want to remove ${plant.name} from your collection?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deletePlant(plantId);
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete plant');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const loadCareAdvice = async (plantData) => {
     setLoading(true);
     try {
-      const weatherData = await getCurrentWeather();
       const advice = await getCareAdvice(
         plantData.name,
         plantData.plantData,
-        weatherData
+        null // No weather data needed
       );
       setCareAdvice(advice);
       await updatePlant(plantId, { careAdvice: advice });
@@ -101,11 +116,26 @@ const PlantDetailScreen = () => {
   };
 
   const handleWaterPlant = async () => {
+    if (!plant) return;
+    
+    const wateringFrequency = getWateringFrequency(plant.name, plant.species);
+    const canWater = canWaterPlant(plant.lastWatered, wateringFrequency);
+    
+    if (!canWater && plant.lastWatered) {
+      const timeUntil = getTimeUntilNextWatering(plant.lastWatered, wateringFrequency);
+      const message = timeUntil.days > 0
+        ? `Please wait ${timeUntil.days} more day${timeUntil.days > 1 ? 's' : ''} before watering again.`
+        : `Please wait ${timeUntil.hours} more hour${timeUntil.hours > 1 ? 's' : ''} before watering again.`;
+      Alert.alert('Cooldown Active', message);
+      return;
+    }
+    
     try {
       await updatePlant(plantId, {
         lastWatered: new Date().toISOString(),
+        wateringFrequency: wateringFrequency, // Store frequency for future reference
       });
-      setPlant({ ...plant, lastWatered: new Date().toISOString() });
+      setPlant({ ...plant, lastWatered: new Date().toISOString(), wateringFrequency });
       Alert.alert('Success', 'Watering logged!');
     } catch (error) {
       Alert.alert('Error', 'Failed to update watering');
@@ -153,6 +183,12 @@ const PlantDetailScreen = () => {
       )
     : null;
 
+  // Calculate watering frequency and cooldown status
+  const wateringFrequency = plant.wateringFrequency || getWateringFrequency(plant.name, plant.species);
+  const canWater = canWaterPlant(plant.lastWatered, wateringFrequency);
+  const nextWateringMessage = formatNextWateringMessage(plant.lastWatered, wateringFrequency);
+  const timeUntilWatering = getTimeUntilNextWatering(plant.lastWatered, wateringFrequency);
+
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -192,12 +228,28 @@ const PlantDetailScreen = () => {
                 }
                 style={[styles.nameGradient, { borderColor: theme.border }]}
               >
-                <Text style={[styles.plantName, { color: theme.text }]}>{plant.name}</Text>
-                {plant.species && (
-                  <Text style={[styles.species, { color: theme.iconAccent }]}>
-                    {plant.species}
-                  </Text>
-                )}
+                <View style={styles.nameHeader}>
+                  <View style={styles.nameContent}>
+                    <Text style={[styles.plantName, { color: theme.text }]}>{plant.name}</Text>
+                    {plant.species && (
+                      <Text style={[styles.species, { color: theme.iconAccent }]}>
+                        {plant.species}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    onPress={handleDeletePlant}
+                    style={[
+                      styles.deleteButton,
+                      {
+                        backgroundColor: mode === 'light' ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.2)',
+                      },
+                    ]}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={theme.error} />
+                  </TouchableOpacity>
+                </View>
               </LinearGradient>
             </BlurView>
           </View>
@@ -205,15 +257,20 @@ const PlantDetailScreen = () => {
           {/* Quick Actions */}
           <View style={styles.actionsContainer}>
             <BlurView intensity={40} tint={theme.blurTint} style={styles.actionButton}>
-              <TouchableOpacity onPress={handleWaterPlant} style={styles.actionInner}>
+              <TouchableOpacity
+                onPress={handleWaterPlant}
+                style={styles.actionInner}
+                disabled={!canWater}
+                activeOpacity={canWater ? 0.9 : 1}
+              >
                 <LinearGradient
-                  colors={['#22c55e', '#4ade80']}
+                  colors={canWater ? ['#22c55e', '#4ade80'] : ['#6b7280', '#9ca3af']}
                   style={styles.actionGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
                   <Ionicons name="water" size={22} color="#f9fafb" />
-                  <Text style={styles.actionText}>Water</Text>
+                  <Text style={styles.actionText}>{canWater ? 'Water' : 'On Cooldown'}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </BlurView>
@@ -241,62 +298,42 @@ const PlantDetailScreen = () => {
           </View>
 
           {/* Watering Status */}
-          {daysSinceWatered !== null && (
-            <BlurView
-              intensity={40}
-              tint={theme.blurTint}
-              style={[
-                styles.statusCard,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Ionicons
-                name={daysSinceWatered >= 3 ? 'warning' : 'checkmark-circle'}
-                size={24}
-                color={daysSinceWatered >= 3 ? theme.warning : theme.success}
-              />
-              <View style={styles.statusInfo}>
-                <Text style={[styles.statusTitle, { color: theme.text }]}>
-                  {daysSinceWatered >= 3 ? 'Needs Watering' : 'Recently Watered'}
-                </Text>
-                <Text style={[styles.statusText, { color: theme.textMuted }]}>
-                  {daysSinceWatered === 0
-                    ? 'Watered today'
+          <BlurView
+            intensity={40}
+            tint={theme.blurTint}
+            style={[
+              styles.statusCard,
+              {
+                backgroundColor: theme.card,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <Ionicons
+              name={canWater ? (daysSinceWatered >= wateringFrequency ? 'warning' : 'checkmark-circle') : 'time-outline'}
+              size={24}
+              color={canWater ? (daysSinceWatered >= wateringFrequency ? theme.warning : theme.success) : theme.textMuted}
+            />
+            <View style={styles.statusInfo}>
+              <Text style={[styles.statusTitle, { color: theme.text }]}>
+                {canWater
+                  ? daysSinceWatered >= wateringFrequency
+                    ? 'Needs Watering'
+                    : 'Recently Watered'
+                  : 'On Cooldown'}
+              </Text>
+              <Text style={[styles.statusText, { color: theme.textMuted }]}>
+                {plant.lastWatered
+                  ? daysSinceWatered === 0
+                    ? `Watered today • ${nextWateringMessage}`
                     : daysSinceWatered === 1
-                    ? 'Watered yesterday'
-                    : `Watered ${daysSinceWatered} days ago`}
-                </Text>
-              </View>
-            </BlurView>
-          )}
+                    ? `Watered yesterday • ${nextWateringMessage}`
+                    : `Watered ${daysSinceWatered} days ago • ${nextWateringMessage}`
+                  : `Ready to water • Every ${wateringFrequency} day${wateringFrequency > 1 ? 's' : ''}`}
+              </Text>
+            </View>
+          </BlurView>
 
-          {/* Weather Info */}
-          {weather && (
-            <BlurView
-              intensity={40}
-              tint={theme.blurTint}
-              style={[
-                styles.weatherCard,
-                {
-                  backgroundColor: theme.card,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Ionicons name="partly-sunny" size={24} color={theme.iconAccent} />
-              <View style={styles.weatherInfo}>
-                <Text style={[styles.weatherText, { color: theme.text }]}>
-                  {Math.round(weather.temp)}°C • {weather.description}
-                </Text>
-                <Text style={[styles.weatherLocation, { color: theme.textMuted }]}>
-                  {weather.location.city}
-                </Text>
-              </View>
-            </BlurView>
-          )}
 
           {/* Care Advice */}
           {careAdvice && (
@@ -472,6 +509,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
   },
+  nameHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  nameContent: {
+    flex: 1,
+    paddingRight: 12,
+  },
   plantName: {
     fontSize: 32,
     fontWeight: '800',
@@ -479,6 +525,14 @@ const styles = StyleSheet.create({
   },
   species: {
     fontSize: 16,
+  },
+  deleteButton: {
+    padding: 10,
+    borderRadius: 12,
+    minWidth: 40,
+    minHeight: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -531,31 +585,6 @@ const styles = StyleSheet.create({
     color: '#f9fafb',
   },
   statusText: {
-    fontSize: 12,
-    color: '#cbd5f5',
-    marginTop: 4,
-  },
-  weatherCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    padding: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(148,163,184,0.4)',
-    backgroundColor: 'rgba(15,23,42,0.7)',
-  },
-  weatherInfo: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  weatherText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#f9fafb',
-  },
-  weatherLocation: {
     fontSize: 12,
     color: '#cbd5f5',
     marginTop: 4,
