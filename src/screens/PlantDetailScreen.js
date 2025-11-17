@@ -105,12 +105,19 @@ const PlantDetailScreen = () => {
     }
 
     setLoading(true);
+    setIssues(null); // Clear previous issues
     try {
+      console.log('Starting health check, theme mode:', mode);
       const issuesData = await detectPlantIssues(plant.imageUri, plant.name);
+      console.log('Health check completed, setting issues:', issuesData?.substring(0, 50));
       setIssues(issuesData);
+      console.log('Issues state should be set');
     } catch (error) {
-      Alert.alert('Error', 'Failed to detect issues');
+      console.error('Health check error:', error);
+      Alert.alert('Error', error?.message || 'Failed to detect issues');
+      setIssues(null);
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };
@@ -643,12 +650,10 @@ const styles = StyleSheet.create({
   issuesTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#f9fafb',
     marginLeft: 12,
   },
   issuesText: {
     fontSize: 14,
-    color: '#e5e7eb',
     lineHeight: 22,
   },
   notesCard: {
