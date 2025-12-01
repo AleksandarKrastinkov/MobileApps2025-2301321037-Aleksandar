@@ -10,8 +10,8 @@ const LoadingOverlay = ({ message = 'Loading...' }) => {
   const theme = getThemeColors(mode);
   
   return (
-    <View style={styles.overlay}>
-      <BlurView intensity={20} tint={theme.blurTint} style={styles.blur}>
+    <View style={styles.overlay} pointerEvents="box-none">
+      <BlurView intensity={20} tint={theme.blurTint} style={styles.blur} pointerEvents="box-none">
         <LinearGradient
           colors={
             mode === 'light'
